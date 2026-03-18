@@ -37,5 +37,66 @@
  *   // Sorted: CSK(3), RCB(1), MI(0)
  */
 export function iplPointsTable(matches) {
-  // Your code here
+  if (!Array.isArray(matches) || matches.length === 0) {
+    return [];
+  }
+
+  const table = {};
+
+  function initTeam(name) {
+    if (!table[name]) {
+      table[name] = {
+        team: name,
+        played: 0,
+        won: 0,
+        lost: 0,
+        tied: 0,
+        noResult: 0,
+        points: 0
+      };
+    }
+  }
+
+  for (let i = 0; i < matches.length; i++) {
+    const match = matches[i];
+    const { team1, team2, result, winner } = match;
+
+    initTeam(team1);
+    initTeam(team2);
+
+    const t1 = table[team1];
+    const t2 = table[team2];
+
+    t1.played++;
+    t2.played++;
+
+    if (result === "win") {
+      if (winner === team1) {
+        t1.won++;
+        t1.points += 2;
+        t2.lost++;
+      } else if (winner === team2) {
+        t2.won++;
+        t2.points += 2;
+        t1.lost++;
+      }
+    } else if (result === "tie") {
+      t1.tied++;
+      t2.tied++;
+      t1.points += 1;
+      t2.points += 1;
+    } else if (result === "no_result") {
+      t1.noResult++;
+      t2.noResult++;
+      t1.points += 1;
+      t2.points += 1;
+    }
+  }
+
+  return Object.values(table).sort((a, b) => {
+    if (b.points !== a.points) {
+      return b.points - a.points; // Descending points
+    }
+    return a.team.localeCompare(b.team); // Ascending name
+  });
 }
